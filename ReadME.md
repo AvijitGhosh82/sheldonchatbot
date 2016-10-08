@@ -1,2 +1,5 @@
-# Facebook Messenger Bot
-We are building a chat bot for the KOSS Fb page to automate messages. Work in progress.
+# Sheldonisms Messenger Bot
+
+A messenger chatbot that replies with random quotes by Sheldon Cooper of Big Bang Theory.     
+
+(Click here to chat)[https://www.messenger.com/t/therealbazin
