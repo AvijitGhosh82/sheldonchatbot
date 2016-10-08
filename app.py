@@ -47,7 +47,7 @@ def webhook():
                     if message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
                     	while True:
                     		show=random.choice(quotes)
-                    		if len(show)>0:
+                    		if len(show)>0 and len(show)<320:
                     			break
                     	send_message(sender_id, show)
                     else:
