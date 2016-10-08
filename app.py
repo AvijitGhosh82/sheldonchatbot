@@ -11,6 +11,7 @@ import random
 app = Flask(__name__)
 
 quotes=pickle.load(open('quoteobj'))
+quotes=filter(None, quotes)
 
 
 @app.route('/', methods=['GET'])
