@@ -4,8 +4,13 @@ import json
 
 import requests
 from flask import Flask, request
+import pickle
+import random
+
 
 app = Flask(__name__)
+
+quotes=pickle.load(open('quoteobj'))
 
 
 @app.route('/', methods=['GET'])
@@ -17,7 +22,7 @@ def verify():
             return "Verification token mismatch", 403
         return request.args["hub.challenge"], 200
 
-    return "Hello world", 200
+    return "Welcome to Sheldonisms", 200
 
 
 @app.route('/', methods=['POST'])
@@ -39,7 +44,12 @@ def webhook():
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                     message_text = messaging_event["message"]["text"]  # the message's text
 
-                    send_message(sender_id, "got it, thanks!")
+                    if message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
+                    	show=random.choice(quotes)
+                    	send_message(sender_id, show)
+                    else:
+                    	send_message(sender_id, "Sorry, that command is not supported. Type Bazinga! for a new quote.")
+
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
