@@ -11,7 +11,6 @@ import random
 app = Flask(__name__)
 
 quotes=pickle.load(open('quoteobj'))
-quotes=filter(None, quotes)
 
 
 @app.route('/', methods=['GET'])
@@ -46,7 +45,10 @@ def webhook():
                     message_text = messaging_event["message"]["text"]  # the message's text
 
                     if message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
-                    	show=random.choice(quotes)
+                    	while True:
+                    		show=random.choice(quotes)
+                    		if len(show)>0:
+                    			break
                     	send_message(sender_id, show)
                     else:
                     	send_message(sender_id, "Sorry, that command is not supported. Type Bazinga! for a new quote.")
