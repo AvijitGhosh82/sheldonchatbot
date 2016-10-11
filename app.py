@@ -17,7 +17,6 @@ quotes=pickle.load(open('quoteobj'))
 def verify():
     # when the endpoint is registered as a webhook, it must echo back
     # the 'hub.challenge' value it receives in the query arguments
-    # server down
     if request.args.get("hub.mode") == "subscribe" and request.args.get("hub.challenge"):
         if not request.args.get("hub.verify_token") == os.environ["VERIFY_TOKEN"]:
             return "Verification token mismatch", 403
@@ -49,8 +48,11 @@ def webhook():
                     except:
                     	message_text = "Something else"
 
-                    if message_text.lower()=="hi" or message_text.lower()=="hi!" or message_text.lower()=="hello!" or message_text.lower()=="hello" or message_text.lower()=="hey!" or message_text.lower()=="hello!":
+                    if message_text.lower()=="hi" or message_text.lower()=="hi!" or message_text.lower()=="hello!" or message_text.lower()=="hello" or message_text.lower()=="hey!" or message_text.lower()=="hey":
                     	send_message(sender_id, "Hello from Sheldon! Type Bazinga! for a new quote.")
+
+                    elif message_text.lower()=="lol" or message_text.lower()=="haha" or message_text.lower()=="hehe":
+                    	send_message(sender_id, "You think I'm funny, but I'm serious. Well, mostly. Type Bazinga for the next one!")
 
                     elif message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
                     	while True:
