@@ -43,7 +43,11 @@ def webhook():
 
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
-                    message_text = messaging_event["message"]["text"]  # the message
+                    message_text=""
+                    try:
+                    	message_text = messaging_event["message"]["text"]  # the message text
+                    except:
+                    	message_text = "Something else"
 
                     if message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
                     	while True:
