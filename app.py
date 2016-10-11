@@ -49,6 +49,10 @@ def webhook():
                     except:
                     	message_text = "Something else"
 
+                    if message_text.lower()=="hi" or message_text.lower()=="hi!" or message_text.lower()=="hello!" or message_text.lower()=="hello" or message_text.lower()=="hey!" or message_text.lower()=="hello!":
+                    	send_message(sender_id, "Hello from Sheldon! Type Bazinga! for a new quote.")
+
+
                     if message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
                     	while True:
                     		show=random.choice(quotes)
