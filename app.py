@@ -61,12 +61,13 @@ def webhook():
                     	while True:
                     		show=random.choice(quotes)
                     		if len(show)>0:
-                    			break
-                    		if len(show)<320:
-                    			send_message(sender_id, show)
-                    		else:
-                    			for chunk in chunkstring(show, 300):
-                    				send_message(sender_id, chunk)
+	                    		if len(show)<320:
+	                    			send_message(sender_id, show)
+	                    			break
+	                    		else:
+	                    			for chunk in chunkstring(show, 300):
+	                    				send_message(sender_id, chunk)
+	                    			break
 
                     else:
                     	send_message(sender_id, "Sorry, that command is not supported. Type Bazinga! for a new quote.")
