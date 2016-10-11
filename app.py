@@ -12,6 +12,9 @@ app = Flask(__name__)
 
 quotes=pickle.load(open('quoteobj'))
 
+def chunkstring(string, length):
+    return (string[0+i:length+i] for i in range(0, len(string), length))
+
 
 @app.route('/', methods=['GET'])
 def verify():
@@ -57,9 +60,14 @@ def webhook():
                     elif message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
                     	while True:
                     		show=random.choice(quotes)
-                    		if len(show)>0 and len(show)<320:
+                    		if len(show)>0:
                     			break
-                    	send_message(sender_id, show)
+                    		if len(show)<320:
+                    			send_message(sender_id, show)
+                    		else:
+                    			for chunk in chunkstring(show, 300):
+                    				send_message(sender_id, chunk)
+
                     else:
                     	send_message(sender_id, "Sorry, that command is not supported. Type Bazinga! for a new quote.")
 
