@@ -54,10 +54,17 @@ def webhook():
                     	message_text = "Something else"
 
                     if message_text.lower()=="hi" or message_text.lower()=="hi!" or message_text.lower()=="hello!" or message_text.lower()=="hello" or message_text.lower()=="hey!" or message_text.lower()=="hey":
-                    	send_message(sender_id, u'Hello from Sheldon! 🖖 \nType Bazinga! for a new quote.'.encode('utf-8'))
+                    	send_message(sender_id, u'Hello from Sheldon! 🖖 \nSend Bazinga! for a new quote.'.encode('utf-8'))
+                    	quickreply(sender_id)
+
 
                     elif message_text.lower()=="lol" or message_text.lower()=="haha" or message_text.lower()=="hehe":
-                    	send_message(sender_id, "You think I'm funny, but I'm serious. Well, mostly. Type Bazinga for the next one!")
+                    	send_message(sender_id, "You think I'm funny, but I'm serious. Well, mostly. Send Bazinga for the next one!")
+                    	quickreply(sender_id)
+
+
+                    elif message_text.lower()=="i'm done":
+                    	send_message(sender_id, "Goodbye, human. If you require more of my humour, type Bazinga to wake me up.")
 
                     elif message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
                     	while True:
@@ -65,14 +72,17 @@ def webhook():
                     		if len(show)>0:
 	                    		if len(show)<320:
 	                    			send_message(sender_id, show)
+	                    			quickreply(sender_id)
 	                    			break
 	                    		else:
 	                    			for chunk in chunkstring(show, 300):
 	                    				send_message(sender_id, chunk)
+	                    			quickreply(sender_id)
 	                    			break
 
                     else:
-                    	send_message(sender_id, "Sorry, that command is not supported. Type Bazinga! for a new quote.")
+                    	send_message(sender_id, "Sorry, that command is not supported. Send Bazinga! for a new quote.")
+	                    quickreply(sender_id)
 
 
                 if messaging_event.get("delivery"):  # delivery confirmation
@@ -103,6 +113,40 @@ def send_message(recipient_id, message_text):
         },
         "message": {
             "text": message_text
+        }
+    })
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
+    if r.status_code != 200:
+        log(r.status_code)
+        log(r.text)
+
+
+def quickreply(recipient_id):
+
+    params = {
+        "access_token": os.environ["PAGE_ACCESS_TOKEN"]
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = json.dumps({
+        "recipient": {
+            "id": recipient_id
+        },
+        "message": {
+            "text": u'🖖'.encode('utf-8')
+            "quick_replies":[
+		      {
+		        "content_type":"text",
+		        "title":"Bazinga!",
+		        "payload":"NEW_JOKE"
+		      },
+		      {
+		        "content_type":"text",
+		        "title":"I'm done",
+		        "payload":"DONE"
+		      }
+		    ]
         }
     })
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
