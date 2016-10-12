@@ -54,7 +54,7 @@ def webhook():
                     	message_text = "Something else"
 
                     if message_text.lower()=="hi" or message_text.lower()=="hi!" or message_text.lower()=="hello!" or message_text.lower()=="hello" or message_text.lower()=="hey!" or message_text.lower()=="hey":
-                    	send_message(sender_id, u'Hello from Sheldon 🖖 \n Type Bazinga! for a new quote.'.encode('utf-8'))
+                    	send_message(sender_id, u'Hello from Sheldon! 🖖 \nType Bazinga! for a new quote.'.encode('utf-8'))
 
                     elif message_text.lower()=="lol" or message_text.lower()=="haha" or message_text.lower()=="hehe":
                     	send_message(sender_id, "You think I'm funny, but I'm serious. Well, mostly. Type Bazinga for the next one!")
