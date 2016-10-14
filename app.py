@@ -8,6 +8,8 @@ import requests
 from flask import Flask, request
 import pickle
 import random
+import apiai
+
 
 
 app = Flask(__name__)
@@ -16,6 +18,14 @@ quotes=pickle.load(open('quoteobj'))
 
 def chunkstring(string, length):
 	return (string[0+i:length+i] for i in range(0, len(string), length))
+
+def apiai_call(message):
+    ai = apiai.ApiAI(os.environ["APIAI_CLIENT_ACCESS_TOKEN"])
+    request = ai.text_request()
+    request.query = message 
+    response = request.getresponse()
+    response_json = json.loads(response.read().decode('utf-8'))
+    return response_json['result']['fulfillment']['speech']
 
 
 @app.route('/', methods=['GET'])
@@ -51,19 +61,19 @@ def webhook():
 					try:
 						message_text = messaging_event["message"]["text"]  # the message text
 					except:
-						message_text = "Something else"
+						message_text = "Sticker!"
 
-					if message_text.lower()=="hi" or message_text.lower()=="hi!" or message_text.lower()=="hello!" or message_text.lower()=="hello" or message_text.lower()=="hey!" or message_text.lower()=="hey":
-						send_message(sender_id, u'Hello from Sheldon! 🖖 \nSend Bazinga! for a new quote.'.encode('utf-8'))
-						quickreply(sender_id)
-
-
-					elif message_text.lower()=="lol" or message_text.lower()=="haha" or message_text.lower()=="hehe":
-						send_message(sender_id, "You think I'm funny, but I'm serious. Well, mostly. Send Bazinga for the next one!")
-						quickreply(sender_id)
+					# if message_text.lower()=="hi" or message_text.lower()=="hi!" or message_text.lower()=="hello!" or message_text.lower()=="hello" or message_text.lower()=="hey!" or message_text.lower()=="hey":
+					# 	send_message(sender_id, u'Hello from Sheldon! 🖖 \nSend Bazinga! for a new quote.'.encode('utf-8'))
+					# 	quickreply(sender_id)
 
 
-					elif message_text.lower()=="i'm done":
+					# elif message_text.lower()=="lol" or message_text.lower()=="haha" or message_text.lower()=="hehe":
+					# 	send_message(sender_id, "You think I'm funny, but I'm serious. Well, mostly. Send Bazinga for the next one!")
+					# 	quickreply(sender_id)
+
+
+					if message_text.lower()=="i'm done":
 						send_message(sender_id, "Goodbye, human. If you require more of my humour, type Bazinga to wake me up.")
 
 					elif message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
@@ -81,7 +91,7 @@ def webhook():
 									break
 
 					else:
-						send_message(sender_id, "Sorry, that command is not supported. Send Bazinga! for a new quote.")
+						send_message(sender_id, apiai_call(message_text))
 						quickreply(sender_id)
 
 
