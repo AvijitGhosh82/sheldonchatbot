@@ -4,11 +4,13 @@ import os
 import sys
 import json
 
+from bs4 import BeautifulSoup
 import requests
 from flask import Flask, request
 import pickle
 import random
 import apiai
+import re
 
 
 
@@ -26,6 +28,25 @@ def apiai_call(message):
     response = request.getresponse()
     response_json = json.loads(response.read().decode('utf-8'))
     return response_json['result']['fulfillment']['speech']
+
+def findmeme():
+	url = "http://www.memecenter.com/search/big%20bang%20theory"
+	links = []
+	response = requests.get(url)
+	soup = BeautifulSoup(response.text, "html.parser")
+	
+	for line in soup.find_all('img', class_ = "rrcont"):
+		links.append(line.get('src'))
+	
+	url = "http://www.wapppictures.com/30-hilarious-memes-big-bang-theory/"
+	response = requests.get(url)
+	soup = BeautifulSoup(response.text, "html.parser")
+	for line in soup.find_all('img', class_ = re.compile("aligncenter+")):
+		links.append(line.get('src'))
+
+	random.shuffle(links)
+
+	return links
 
 
 @app.route('/', methods=['GET'])
@@ -72,8 +93,10 @@ def webhook():
 					# 	send_message(sender_id, "You think I'm funny, but I'm serious. Well, mostly. Send Bazinga for the next one!")
 					# 	quickreply(sender_id)
 
+					links = findmeme()
 
 					if message_text.lower()=="i'm done":
+						type_message(sender_id)
 						send_message(sender_id, "Goodbye, human. If you require more of my humour, type Bazinga to wake me up.")
 
 					elif message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
@@ -81,16 +104,25 @@ def webhook():
 							show=random.choice(quotes)
 							if len(show)>0:
 								if len(show)<320:
+									type_message(sender_id)
 									send_message(sender_id, show)
 									quickreply(sender_id)
 									break
 								else:
 									for chunk in chunkstring(show, 300):
+										type_message(sender_id)
 										send_message(sender_id, chunk)
 									quickreply(sender_id)
 									break
 
+					elif message_text.lower()=="meme" or message_text.lower()=="send me a meme" or message_text.lower()=="show me a meme":
+						type_message(sender_id)
+						random.shuffle(links)
+						sendmeme(sender_id, links)
+						quickreply(sender_id)
+
 					else:
+						type_message(sender_id)
 						send_message(sender_id, apiai_call(message_text))
 						quickreply(sender_id)
 
@@ -131,6 +163,54 @@ def send_message(recipient_id, message_text):
 		log(r.text)
 
 
+def sendmeme(recipient_id, links):
+
+	params = {
+		"access_token": os.environ["PAGE_ACCESS_TOKEN"]
+	}
+	headers = {
+		"Content-Type": "application/json"
+	}
+	data = json.dumps({
+		"recipient": {
+			"id": recipient_id
+		},
+		"message": {
+			"attachment":{
+      			"type":"image",
+      			"payload":{
+        			"url": links[0]
+      			}
+    		}
+		}
+	})
+	r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
+	if r.status_code != 200:
+		log(r.status_code)
+		log(r.text)
+
+def type_message(recipient_id):
+
+    log("typing bubbles message to {recipient}".format(recipient=recipient_id))
+
+    params = {
+        "access_token": os.environ["PAGE_ACCESS_TOKEN"]
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = json.dumps({
+        "recipient": {
+            "id": recipient_id
+        },
+        "sender_action":"typing_on"
+    })
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
+    if r.status_code != 200:
+        log(r.status_code)
+        log(r.text)
+
+
 def quickreply(recipient_id):
 
 	params = {
@@ -150,6 +230,11 @@ def quickreply(recipient_id):
 				"content_type":"text",
 				"title":"Bazinga!",
 				"payload":"NEW_JOKE"
+			  },
+			  {
+				"content_type":"text",
+				"title":"Meme",
+				"payload":"MEME"
 			  },
 			  {
 				"content_type":"text",
