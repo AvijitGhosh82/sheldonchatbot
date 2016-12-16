@@ -14,7 +14,9 @@ Follow this link : https://blog.hartleybrody.com/fb-messenger-bot/
 APIAI_CLIENT_ACCESS_TOKEN = client access token from api.ai <br>
 FB_ACCESS_TOKEN = Facebook app access token <br>
 PAGE_ACCESS_TOKEN = The page access token of your facebook page <br>
-VERIFY_TOKEN = The verification token made while making a webhook
+VERIFY_TOKEN = The verification token made while making a webhook <br>
+DB_URL = The Database URL from Heroku Postgres Database credentials <br>
+SQLALCHEMY_TRACK_MODIFICATIONS = true
 
 Note: For Api.ai token, you need to sign up on [Api.ai](https://api.ai/). After that, note down your access token. 
 In order to load and edit the agent that Sheldonisms uses, you need to import [Sheldon.zip](https://dl.dropboxusercontent.com/u/83087853/Sheldon.zip) to your console on Apiai.
