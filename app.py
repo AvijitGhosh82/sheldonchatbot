@@ -17,11 +17,10 @@ import re
 
 app = Flask(__name__)
 
-#Enter your database URL here , Get from Heroku Database Crdentials
+#DB_URL is configured in Heroku Tokens
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
-os.environ['DATABASE_URL'] = 'postgres://nqzbhrnyrmcwsp:371a5e4edb0270cdfc1e494c91178274bf17edf4b4d0cc4e5a0e20a9080262e9@ec2-54-225-119-223.compute-1.amazonaws.com:5432/dft9ctgao0i98a'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URL")
 db = SQLAlchemy(app)
 
 #class to define object to be fetched from database
