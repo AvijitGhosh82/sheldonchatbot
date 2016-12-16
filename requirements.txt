@@ -10,3 +10,5 @@ wsgiref==0.1.2
 apiai
 bs4
 regex
+psycopg2
+flask_sqlalchemy
