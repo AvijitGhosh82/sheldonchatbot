@@ -7,6 +7,7 @@ import json
 from bs4 import BeautifulSoup
 import requests
 from flask import Flask, request
+from flask_sqlalchemy import SQLAlchemy
 import pickle
 import random
 import apiai
@@ -15,6 +16,24 @@ import re
 
 
 app = Flask(__name__)
+
+#DB_URL is configured in Heroku Tokens
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URL")
+db = SQLAlchemy(app)
+
+#class to define object to be fetched from database
+
+class db_Meme(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String(300),unique=True)
+
+    def __init__(self, url):
+        self.url = url
+
+    def __repr__(self):
+        return self.url
 
 quotes=pickle.load(open('quoteobj'))
 
@@ -29,24 +48,12 @@ def apiai_call(message):
     response_json = json.loads(response.read().decode('utf-8'))
     return response_json['result']['fulfillment']['speech']
 
-def findmeme():
-	url = "http://www.memecenter.com/search/big%20bang%20theory"
-	links = []
-	response = requests.get(url)
-	soup = BeautifulSoup(response.text, "html.parser")
-	
-	for line in soup.find_all('img', class_ = "rrcont"):
-		links.append(line.get('src'))
-	
-	url = "http://www.wapppictures.com/30-hilarious-memes-big-bang-theory/"
-	response = requests.get(url)
-	soup = BeautifulSoup(response.text, "html.parser")
-	for line in soup.find_all('img', class_ = re.compile("aligncenter+")):
-		links.append(line.get('src'))
+#Meme is fetched from Database
 
-	random.shuffle(links)
-
-	return links
+def get_meme_from_db():
+	all_memes=db_Meme.query.all()
+	meme=random.choice(all_memes)
+	return meme.url
 
 
 @app.route('/', methods=['GET'])
@@ -93,7 +100,6 @@ def webhook():
 					# 	send_message(sender_id, "You think I'm funny, but I'm serious. Well, mostly. Send Bazinga for the next one!")
 					# 	quickreply(sender_id)
 
-					links = findmeme()
 
 					if message_text.lower()=="i'm done":
 						type_message(sender_id)
@@ -117,8 +123,7 @@ def webhook():
 
 					elif message_text.lower()=="meme" or message_text.lower()=="send me a meme" or message_text.lower()=="show me a meme":
 						type_message(sender_id)
-						random.shuffle(links)
-						sendmeme(sender_id, links)
+						sendmeme(sender_id, get_meme_from_db())
 						quickreply(sender_id)
 
 					else:
@@ -163,7 +168,7 @@ def send_message(recipient_id, message_text):
 		log(r.text)
 
 
-def sendmeme(recipient_id, links):
+def sendmeme(recipient_id, meme_url):
 
 	params = {
 		"access_token": os.environ["PAGE_ACCESS_TOKEN"]
@@ -179,7 +184,7 @@ def sendmeme(recipient_id, links):
 			"attachment":{
       			"type":"image",
       			"payload":{
-        			"url": links[0]
+        			"url": meme_url
       			}
     		}
 		}
@@ -248,7 +253,6 @@ def quickreply(recipient_id):
 	if r.status_code != 200:
 		log(r.status_code)
 		log(r.text)
-
 
 def log(message):  # simple wrapper for logging to stdout on heroku
 	print str(message)
