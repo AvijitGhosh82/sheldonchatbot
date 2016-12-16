@@ -13,7 +13,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = true <br>
 
 
 Note: you have to run Python from heroku and initialize your database as follows
->>from app import db
+>>from app import db <br>
 >>db.create_all()
 
 *Sheldonisms* is participating in Kharagpur Winter of Code 2016. Join this [Facebook group](https://www.facebook.com/groups/1125067874207040/?fref=nf) to ask doubts and discuss. 
