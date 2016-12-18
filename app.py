@@ -10,6 +10,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 import pickle
 import random
+from random import randint
 import apiai
 import re
 
@@ -23,7 +24,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URL")
 db = SQLAlchemy(app)
 
-#class to define object to be fetched from database
+#class to define meme object to be fetched from database
 
 class db_Meme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,7 +36,18 @@ class db_Meme(db.Model):
     def __repr__(self):
         return self.url
 
-quotes=pickle.load(open('quoteobj'))
+#class to define Quote object to be fetched from database
+
+class db_Quote(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    quote = db.Column(db.String(5000),unique=True)
+
+    def __init__(self, url):
+        self.quote = quote
+
+    def __repr__(self):
+        return self.quote
+
 
 def chunkstring(string, length):
 	return (string[0+i:length+i] for i in range(0, len(string), length))
@@ -54,6 +66,14 @@ def get_meme_from_db():
 	all_memes=db_Meme.query.all()
 	meme=random.choice(all_memes)
 	return meme.url
+
+#Quote is fetched from Database
+
+def get_quote_from_db():
+	no_of_records = db.session.query(db_Quote).count()
+	random_id = randint(1,no_of_records-1)
+	random_quote = db_Quote.query.get(random_id)
+	return random_quote.quote
 
 
 @app.route('/', methods=['GET'])
@@ -107,7 +127,8 @@ def webhook():
 
 					elif message_text.lower()=="bazinga" or message_text.lower()=="bazinga!":
 						while True:
-							show=random.choice(quotes)
+							quote=get_quote_from_db()
+							show=quote
 							if len(show)>0:
 								if len(show)<320:
 									type_message(sender_id)
