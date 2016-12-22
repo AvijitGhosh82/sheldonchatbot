@@ -154,4 +154,4 @@ sched.start()
 if __name__ == '__main__':
 	app.run(debug=True)
 	log('App has been scheduled to Update Database every Day at 00:00 AM')
-	sched.start())
+	sched.start()
