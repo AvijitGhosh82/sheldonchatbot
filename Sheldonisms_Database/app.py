@@ -94,15 +94,20 @@ def update_db():
 	
 	no_of_quotes = len(quotes)
 	no_of_records = db.session.query(db_Quote).count()
-	
+
 	if no_of_quotes != no_of_records:
-		db_records = db_Quote.query.all()
+		
+		db_records_tem=db_Quote.query.all()
+		db_records=[]
+		for record in db_records_tem:
+			db_records.append(record.quote)
+
 		for quote in quotes:
 			quote_object = db_Quote(quote)
-			if not quote_object in db_records:		# Insert only New quotes that are not found in database
+			if not quote_object.quote in db_records:		# Insert only New quotes that are not found in database
 				db.session.add(quote_object)
 				db.session.commit()
-			no_of_quotes=no_of_quotes-1
+				no_of_quotes=no_of_quotes-1
 			if no_of_quotes == no_of_records:				# Insert only until last update
 				break
 	
@@ -149,4 +154,4 @@ sched.start()
 if __name__ == '__main__':
 	app.run(debug=True)
 	log('App has been scheduled to Update Database every Day at 00:00 AM')
-	sched.start()
+	sched.start())
